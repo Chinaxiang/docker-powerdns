@@ -29,7 +29,6 @@ sedeasy "PDNS_API_KEY = 'PDNS_API_KEY'" "PDNS_API_KEY = '$API_KEY'" /usr/share/w
 sedeasy "SQLA_DB_USER = 'MYSQL_USER'" "SQLA_DB_USER = '$MYSQL_USER'" /usr/share/webapps/powerdns-admin/config.py
 sedeasy "SQLA_DB_PASSWORD = 'MYSQL_PWD'" "SQLA_DB_PASSWORD = '$MYSQL_PWD'" /usr/share/webapps/powerdns-admin/config.py
 sedeasy "SQLA_DB_HOST = 'MYSQL_HOST'" "SQLA_DB_HOST = '$MYSQL_HOST'" /usr/share/webapps/powerdns-admin/config.py
-sedeasy "SQLA_DB_PORT = 'MYSQL_PORT'" "SQLA_DB_PORT = '$MYSQL_PORT'" /usr/share/webapps/powerdns-admin/config.py
 sedeasy "SQLA_DB_NAME = 'MYSQL_ADMIN_DB'" "SQLA_DB_NAME = '$MYSQL_ADMIN_DB'" /usr/share/webapps/powerdns-admin/config.py
 
 if $MYSQL_AUTOCONF ; then
@@ -64,7 +63,7 @@ fi
 
 if $MYSQL_AUTOCONF ; then
   echo Initializing PowerDNS Admin Database
-  /usr/share/webapps/powerdns-admin/create_db.py
+  python /usr/share/webapps/powerdns-admin/create_db.py
 
   unset -v MYSQL_PASS
 fi
@@ -75,6 +74,7 @@ find $DATA_DIR -type f -exec chmod 664 {} \;
 chown -R nobody:nobody $DATA_DIR
 
 if [ $ENABLE_ADBLOCK = true ]; then
+  echo Initializing ADBLOCK
   # Run at least the first time
   /root/updateHosts.sh
 

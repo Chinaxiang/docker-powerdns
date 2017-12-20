@@ -8,7 +8,7 @@ ENV MYSQL_AUTOCONF=true \
     MYSQL_HOST="localhost" \
     MYSQL_PORT="3306" \
     MYSQL_USER="root" \
-    MYSQL_PWD="root" \
+    MYSQL_PWD="root3306" \
     MYSQL_DB="pdns" \
     MYSQL_ADMIN_DB="pdns_admin"
 
@@ -66,8 +66,8 @@ RUN apk --update add --no-cache \
     pdns \
     pdns-doc \
     pdns-recursor \
+    pdns-backend-mysql \
     mysql-client \
-    mariadb-client-libs \
     mariadb-dev \
     curl \
     dbus \
@@ -78,6 +78,7 @@ RUN apk --update add --no-cache --virtual .build-deps \
     git \
     gcc \
     musl-dev \
+    python \
     python-dev \
     py-pip \
     libffi-dev \
@@ -90,7 +91,6 @@ RUN mkdir -p /usr/share/webapps/ \
     && cd /usr/share/webapps/ \
     && git clone https://github.com/Chinaxiang/PowerDNS-Admin.git powerdns-admin \
     && cd /usr/share/webapps/powerdns-admin \
-    && pip install virtualenv \
     && pip install MySQL-python \
     && pip install --no-cache-dir -r requirements.txt
 
@@ -124,6 +124,7 @@ RUN ln -sf /proc/1/fd/1 /var/log/docker.log
 EXPOSE 53
 EXPOSE 53/udp
 EXPOSE 8080
+EXPOSE 8081
 
 # Change Shell
 ##############
