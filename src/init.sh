@@ -16,10 +16,10 @@ fi
 # Update PowerDNS Server config file
 sedeasy "api-key=API_KEY" "api-key=$API_KEY" /etc/pdns/pdns.conf
 sedeasy "gmysql-host=MYSQL_HOST" "gmysql-host=$MYSQL_HOST" /etc/pdns/pdns.conf
-sedeasy "gmysql-host=MYSQL_PORT" "gmysql-host=$MYSQL_PORT" /etc/pdns/pdns.conf
-sedeasy "gmysql-host=MYSQL_DB" "gmysql-host=$MYSQL_DB" /etc/pdns/pdns.conf
-sedeasy "gmysql-host=MYSQL_USER" "gmysql-host=$MYSQL_USER" /etc/pdns/pdns.conf
-sedeasy "gmysql-host=MYSQL_PWD" "gmysql-host=$MYSQL_PWD" /etc/pdns/pdns.conf
+sedeasy "gmysql-port=MYSQL_PORT" "gmysql-port=$MYSQL_PORT" /etc/pdns/pdns.conf
+sedeasy "gmysql-dbname=MYSQL_DB" "gmysql-dbname=$MYSQL_DB" /etc/pdns/pdns.conf
+sedeasy "gmysql-user=MYSQL_USER" "gmysql-user=$MYSQL_USER" /etc/pdns/pdns.conf
+sedeasy "gmysql-password=MYSQL_PWD" "gmysql-password=$MYSQL_PWD" /etc/pdns/pdns.conf
 
 # Add custom DNS entries
 sedeasy "forward-zones-recurse=.=CUSTOM_DNS" "forward-zones-recurse=.=$CUSTOM_DNS" /etc/pdns/recursor.conf
