@@ -1,7 +1,7 @@
 FROM alpine:edge
-MAINTAINER Julian Xhokaxhiu <info at julianxhokaxhiu dot com>
+MAINTAINER Chinaxiang
 
-# Environment variables
+# 环境变量
 #######################
 
 ENV DATA_DIR /srv/data
@@ -11,17 +11,15 @@ ENV DATA_DIR /srv/data
 
 # Custom DNS where to forward your request, if not found inside the DNS Server.
 # By default this will be forwarded to Google DNS for IPv4 and IPv6 requests.
-# See https://doc.powerdns.com/md/recursor/settings/#forward-zones
 ENV CUSTOM_DNS "8.8.8.8;8.8.4.4;[2001:4860:4860::8888];[2001:4860:4860::8844]"
 
 # Custom API Key for PowerDNS.
 # Leave empty to autogenerate one ( HIGHLY SUGGESTED! )
-# See https://doc.powerdns.com/md/authoritative/settings/#api-key
 ENV API_KEY ""
 
 # Change this cron rule to what fits best for you.
 # Used only if ENABLE_ADBLOCK=true
-# By Default = At 10:00 UTC ~ 2am PST/PDT
+# By Default = At 10:00
 ENV CRONTAB_TIME '0 10 * * *'
 
 # Enable the AdBlock feature
@@ -83,7 +81,7 @@ RUN apk --update add --no-cache --virtual .build-deps \
 
 RUN mkdir -p /usr/share/webapps/ \
     && cd /usr/share/webapps/ \
-    && git clone https://github.com/ngoduykhanh/PowerDNS-Admin.git powerdns-admin \
+    && git clone https://github.com/Chinaxiang/PowerDNS-Admin.git powerdns-admin \
     && cd /usr/share/webapps/powerdns-admin \
     && pip install --no-cache-dir -r requirements.txt
 

@@ -6,10 +6,6 @@ PowerDNS + Recursor + Admin GUI + Adblock in one single Docker
 
 See [Dockerfile](Dockerfile#L9)
 
-## IPv6 support
-
-In order to enable this Docker to handle IPv6 queries, you should do some further actions. See this [preparation script](https://github.com/julianxhokaxhiu/vps-powered-by-docker/blob/master/modules/dns_server.sh#L16) for more informations.
-
 ## Ad-Block feature
 
 If you want to enable ad-blocking on top of your entries, just set the [relative environment variable](Dockerfile#L27) to `true`. List courtesy of [Pi-Hole project](https://pi-hole.net/).
@@ -27,8 +23,7 @@ docker run \
     -p 53:53 \
     -p 53:53/udp \
     -p 80:8080 \
-    -v "/home/user/data:/srv/data" \
-    julianxhokaxhiu/docker-powerdns
+    chinaxiang/docker-powerdns
 ```
 
 ### Advanced
@@ -45,5 +40,5 @@ docker run \
     -p 53:53/udp \
     -p 80:8080 \
     -v "/home/user/data:/srv/data" \
-    julianxhokaxhiu/docker-powerdns
+    chinaxiang/docker-powerdns
 ```
