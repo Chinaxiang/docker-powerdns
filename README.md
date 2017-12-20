@@ -18,12 +18,12 @@ The list will be updated using cron, at the time specified on the [relative envi
 
 ```
 docker run \
-    --restart=always \
     -d \
     -p 53:53 \
     -p 53:53/udp \
-    -p 80:8080 \
-    chinaxiang/docker-powerdns
+    -p 8080:8080 \
+    -p 8081:8081 \
+    registry.cn-hangzhou.aliyuncs.com/chinaxiang/docker-powerdns
 ```
 
 ### Advanced
@@ -32,13 +32,14 @@ docker run \
 docker run \
     --restart=always \
     -d \
-    -e "CUSTOM_DNS=8.8.8.8;8.8.4.4;[2001:4860:4860::8888];[2001:4860:4860::8844]" \
+    -e "CUSTOM_DNS=8.8.8.8;8.8.4.4" \
     -e "API_KEY=my-awesome-api-key" \
     -e "CRONTAB_TIME=0 10 * * *" \
     -e "ENABLE_ADBLOCK=true" \
     -p 53:53 \
     -p 53:53/udp \
-    -p 80:8080 \
+    -p 8080:8080 \
+    -p 8081:8081 \
     -v "/home/user/data:/srv/data" \
-    chinaxiang/docker-powerdns
+    registry.cn-hangzhou.aliyuncs.com/chinaxiang/docker-powerdns
 ```
