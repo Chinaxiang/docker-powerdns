@@ -2,9 +2,15 @@ FROM alpine:edge
 MAINTAINER Chinaxiang
 
 # 环境变量
-#######################
-
 ENV DATA_DIR /srv/data
+
+ENV MYSQL_AUTOCONF=true \
+    MYSQL_HOST="localhost" \
+    MYSQL_PORT="3306" \
+    MYSQL_USER="root" \
+    MYSQL_PWD="root" \
+    MYSQL_DB="pdns" \
+    MYSQL_ADMIN_DB="pdns_admin"
 
 # Configurable environment variables
 ####################################
@@ -60,13 +66,14 @@ RUN apk --update add --no-cache \
     pdns \
     pdns-doc \
     pdns-recursor \
-    pdns-backend-sqlite3 \
-    sqlite \
+    mysql-client \
+    mariadb-client-libs \
+    mariadb-dev \
     curl \
     dbus \
     libldap
 
-# Required by PowerDNS Admin GUI
+# Required by PowerDNS Admin
 RUN apk --update add --no-cache --virtual .build-deps \
     git \
     gcc \
@@ -76,13 +83,15 @@ RUN apk --update add --no-cache --virtual .build-deps \
     libffi-dev \
     openldap-dev
 
-# Install PowerDNS Admin GUI
+# Install PowerDNS Admin
 ##############################
 
 RUN mkdir -p /usr/share/webapps/ \
     && cd /usr/share/webapps/ \
     && git clone https://github.com/Chinaxiang/PowerDNS-Admin.git powerdns-admin \
     && cd /usr/share/webapps/powerdns-admin \
+    && pip install virtualenv \
+    && pip install MySQL-python \
     && pip install --no-cache-dir -r requirements.txt
 
 # Cleanup

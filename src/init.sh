@@ -3,7 +3,6 @@
 # Init script
 #
 ###########################################################
-
 # Thanks to http://stackoverflow.com/a/10467453
 function sedeasy {
   sed -i "s/$(echo $1 | sed -e 's/\([[\/.*]\|\]\)/\\&/g')/$(echo $2 | sed -e 's/[\/&]/\\&/g')/g" $3
@@ -14,34 +13,60 @@ if [ -z "$API_KEY" ]; then
   API_KEY=`dbus-uuidgen`
 fi
 
-# Path where DBs will be stored
-POWERDNS_DB_PATH="$DATA_DIR/powerdns"
-POWERDNSGUI_DB_PATH="$DATA_DIR/powerdnsgui"
-
-# Create directory if they does not exist
-mkdir -p $POWERDNS_DB_PATH
-mkdir -p $POWERDNSGUI_DB_PATH
-
 # Update PowerDNS Server config file
 sedeasy "api-key=API_KEY" "api-key=$API_KEY" /etc/pdns/pdns.conf
-sedeasy "gsqlite3-database=DATABASE_PATH" "gsqlite3-database=$POWERDNS_DB_PATH/db" /etc/pdns/pdns.conf
+sedeasy "gmysql-host=MYSQL_HOST" "gmysql-host=$MYSQL_HOST" /etc/pdns/pdns.conf
+sedeasy "gmysql-host=MYSQL_PORT" "gmysql-host=$MYSQL_PORT" /etc/pdns/pdns.conf
+sedeasy "gmysql-host=MYSQL_DB" "gmysql-host=$MYSQL_DB" /etc/pdns/pdns.conf
+sedeasy "gmysql-host=MYSQL_USER" "gmysql-host=$MYSQL_USER" /etc/pdns/pdns.conf
+sedeasy "gmysql-host=MYSQL_PWD" "gmysql-host=$MYSQL_PWD" /etc/pdns/pdns.conf
 
 # Add custom DNS entries
 sedeasy "forward-zones-recurse=.=CUSTOM_DNS" "forward-zones-recurse=.=$CUSTOM_DNS" /etc/pdns/recursor.conf
 
 # Update PowerDNS Admin GUI configuration file
 sedeasy "PDNS_API_KEY = 'PDNS_API_KEY'" "PDNS_API_KEY = '$API_KEY'" /usr/share/webapps/powerdns-admin/config.py
-sedeasy "SQLALCHEMY_DATABASE_URI = 'SQLALCHEMY_DATABASE_URI'" "SQLALCHEMY_DATABASE_URI = 'sqlite:///$POWERDNSGUI_DB_PATH/db'" /usr/share/webapps/powerdns-admin/config.py
+sedeasy "SQLA_DB_USER = 'MYSQL_USER'" "SQLA_DB_USER = '$MYSQL_USER'" /usr/share/webapps/powerdns-admin/config.py
+sedeasy "SQLA_DB_PASSWORD = 'MYSQL_PWD'" "SQLA_DB_PASSWORD = '$MYSQL_PWD'" /usr/share/webapps/powerdns-admin/config.py
+sedeasy "SQLA_DB_HOST = 'MYSQL_HOST'" "SQLA_DB_HOST = '$MYSQL_HOST'" /usr/share/webapps/powerdns-admin/config.py
+sedeasy "SQLA_DB_PORT = 'MYSQL_PORT'" "SQLA_DB_PORT = '$MYSQL_PORT'" /usr/share/webapps/powerdns-admin/config.py
+sedeasy "SQLA_DB_NAME = 'MYSQL_ADMIN_DB'" "SQLA_DB_NAME = '$MYSQL_ADMIN_DB'" /usr/share/webapps/powerdns-admin/config.py
 
-# Create SQLite database for PowerDNS if it's doesn't exist
-if ! [ -f "$POWERDNS_DB_PATH/db" ]; then
-  sqlite3 $POWERDNS_DB_PATH/db < /usr/share/doc/pdns/schema.sqlite3.sql
+if $MYSQL_AUTOCONF ; then
+  MYSQLCMD="mysql --host=$MYSQL_HOST --user=$MYSQL_USER --password=${MYSQL_PWD} -r -N"
+  # wait for Database come ready
+  isDBup () {
+    echo "SHOW STATUS" | $MYSQLCMD 1>/dev/null
+    echo $?
+  }
+
+  RETRY=10
+  until [ `isDBup` -eq 0 ] || [ $RETRY -le 0 ] ; do
+    echo "Waiting for database to come up"
+    sleep 5
+    RETRY=$(expr $RETRY - 1)
+  done
+  if [ $RETRY -le 0 ]; then
+    >&2 echo Error: Could not connect to Database on $MYSQL_HOST:$MYSQL_PORT
+    exit 1
+  fi
+
+  # init database if necessary
+  echo "CREATE DATABASE IF NOT EXISTS $MYSQL_DB;" | $MYSQLCMD
+  MYSQLCMD="$MYSQLCMD $MYSQL_DB"
+
+  if [ "$(echo "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = \"$MYSQL_DB\";" | $MYSQLCMD)" -le 1 ]; then
+    echo Initializing PowerDNS Database
+    cat /usr/share/doc/pdns/schema.mysql.sql | $MYSQLCMD
+  fi
+
 fi
 
-# Create SQLite database for PowerDNS Admin if it's doesn't exist
-if ! [ -f "$POWERDNSGUI_DB_PATH/db" ]; then
-  sqlite3 $POWERDNSGUI_DB_PATH/db ".databases"
+if $MYSQL_AUTOCONF ; then
+  echo Initializing PowerDNS Admin Database
   /usr/share/webapps/powerdns-admin/create_db.py
+
+  unset -v MYSQL_PASS
 fi
 
 # Fix permissions

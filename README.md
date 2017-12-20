@@ -2,6 +2,8 @@
 
 PowerDNS + Recursor + Admin GUI + Adblock in one single Docker
 
+使用mysql作为后端存储，请另外安装mysql.
+
 ## Configuration options
 
 See [Dockerfile](Dockerfile#L9)
@@ -23,7 +25,7 @@ docker run \
     -p 53:53 \
     -p 53:53/udp \
     -p 80:8080 \
-    chinaxiang/docker-powerdns
+    chinaxiang/docker-powerdns:mysql
 ```
 
 ### Advanced
@@ -40,5 +42,5 @@ docker run \
     -p 53:53/udp \
     -p 80:8080 \
     -v "/home/user/data:/srv/data" \
-    chinaxiang/docker-powerdns
+    chinaxiang/docker-powerdns:mysql
 ```
