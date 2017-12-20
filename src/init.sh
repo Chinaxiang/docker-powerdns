@@ -52,6 +52,7 @@ if $MYSQL_AUTOCONF ; then
 
   # init database if necessary
   echo "CREATE DATABASE IF NOT EXISTS $MYSQL_DB;" | $MYSQLCMD
+  echo "CREATE DATABASE IF NOT EXISTS $MYSQL_ADMIN_DB;" | $MYSQLCMD
   MYSQLCMD="$MYSQLCMD $MYSQL_DB"
 
   if [ "$(echo "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = \"$MYSQL_DB\";" | $MYSQLCMD)" -le 1 ]; then
@@ -59,9 +60,6 @@ if $MYSQL_AUTOCONF ; then
     cat /usr/share/doc/pdns/schema.mysql.sql | $MYSQLCMD
   fi
 
-fi
-
-if $MYSQL_AUTOCONF ; then
   echo Initializing PowerDNS Admin Database
   python /usr/share/webapps/powerdns-admin/create_db.py
 
@@ -72,19 +70,6 @@ fi
 find $DATA_DIR -type d -exec chmod 775 {} \;
 find $DATA_DIR -type f -exec chmod 664 {} \;
 chown -R nobody:nobody $DATA_DIR
-
-if [ $ENABLE_ADBLOCK = true ]; then
-  echo Initializing ADBLOCK
-  # Run at least the first time
-  /root/updateHosts.sh
-
-  # Initialize the cronjob to update hosts, if feature is enabled
-  cronFile=/tmp/buildcron
-  printf "SHELL=/bin/bash" > $cronFile
-  printf "\n$CRONTAB_TIME /usr/bin/flock -n /tmp/lock.hosts /root/updateHosts.sh\n" >> $cronFile
-  crontab $cronFile
-  rm $cronFile
-fi
 
 # Start supervisor
 /usr/bin/supervisord -c /etc/supervisord.conf
