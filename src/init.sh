@@ -26,9 +26,6 @@ mkdir -p $POWERDNSGUI_DB_PATH
 sedeasy "api-key=API_KEY" "api-key=$API_KEY" /etc/pdns/pdns.conf
 sedeasy "gsqlite3-database=DATABASE_PATH" "gsqlite3-database=$POWERDNS_DB_PATH/db" /etc/pdns/pdns.conf
 
-# Add custom DNS entries
-sedeasy "forward-zones-recurse=.=CUSTOM_DNS" "forward-zones-recurse=.=$CUSTOM_DNS" /etc/pdns/recursor.conf
-
 # Update PowerDNS Admin GUI configuration file
 sedeasy "PDNS_API_KEY = 'PDNS_API_KEY'" "PDNS_API_KEY = '$API_KEY'" /usr/share/webapps/powerdns-admin/config.py
 sedeasy "SQLALCHEMY_DATABASE_URI = 'SQLALCHEMY_DATABASE_URI'" "SQLALCHEMY_DATABASE_URI = 'sqlite:///$POWERDNSGUI_DB_PATH/db'" /usr/share/webapps/powerdns-admin/config.py
@@ -48,18 +45,6 @@ fi
 find $DATA_DIR -type d -exec chmod 775 {} \;
 find $DATA_DIR -type f -exec chmod 664 {} \;
 chown -R nobody:nobody $DATA_DIR
-
-if [ $ENABLE_ADBLOCK = true ]; then
-  # Run at least the first time
-  /root/updateHosts.sh
-
-  # Initialize the cronjob to update hosts, if feature is enabled
-  cronFile=/tmp/buildcron
-  printf "SHELL=/bin/bash" > $cronFile
-  printf "\n$CRONTAB_TIME /usr/bin/flock -n /tmp/lock.hosts /root/updateHosts.sh\n" >> $cronFile
-  crontab $cronFile
-  rm $cronFile
-fi
 
 # Start supervisor
 /usr/bin/supervisord -c /etc/supervisord.conf

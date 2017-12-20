@@ -8,22 +8,9 @@ ENV DATA_DIR /srv/data
 
 # Configurable environment variables
 ####################################
-
-# Custom DNS where to forward your request, if not found inside the DNS Server.
-# By default this will be forwarded to Google DNS for IPv4 and IPv6 requests.
-ENV CUSTOM_DNS "8.8.8.8;8.8.4.4;[2001:4860:4860::8888];[2001:4860:4860::8844]"
-
 # Custom API Key for PowerDNS.
 # Leave empty to autogenerate one ( HIGHLY SUGGESTED! )
 ENV API_KEY ""
-
-# Change this cron rule to what fits best for you.
-# Used only if ENABLE_ADBLOCK=true
-# By Default = At 10:00
-ENV CRONTAB_TIME '0 10 * * *'
-
-# Enable the AdBlock feature
-ENV ENABLE_ADBLOCK false
 
 # Create Volume entry points
 ############################
@@ -59,7 +46,6 @@ RUN apk --update add --no-cache \
     supervisor \
     pdns \
     pdns-doc \
-    pdns-recursor \
     pdns-backend-sqlite3 \
     sqlite \
     curl \
@@ -98,10 +84,8 @@ RUN find /usr/local \
 # Replace default configurations
 ################################
 RUN rm /etc/pdns/pdns.conf \
-    && rm /etc/pdns/recursor.conf \
     && rm /etc/supervisord.conf \
     && mv /root/pdns.conf /etc/pdns \
-    && mv /root/recursor.conf /etc/pdns \
     && mv /root/config.py /usr/share/webapps/powerdns-admin \
     && mv /root/supervisord.conf /etc
 
@@ -115,6 +99,7 @@ RUN ln -sf /proc/1/fd/1 /var/log/docker.log
 EXPOSE 53
 EXPOSE 53/udp
 EXPOSE 8080
+EXPOSE 8081
 
 # Change Shell
 ##############
