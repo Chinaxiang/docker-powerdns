@@ -2,11 +2,25 @@
 
 PowerDNS + Admin GUI in one single Docker
 
-使用mysql作为后端存储，请另外安装mysql.
+Use MySQL as backend, please install MySQL before you use this images.
 
 ## Configuration options
 
 See [Dockerfile](Dockerfile)
+
+## Docker images
+
+> Docker Hub
+
+```
+docker pull chinaxiang/docker-powerdns:mysql
+```
+
+> Aliyun Hub
+
+```
+docker pull registry.cn-hangzhou.aliyuncs.com/chinaxiang/docker-powerdns:mysql
+```
 
 ## How to use
 
@@ -14,6 +28,7 @@ See [Dockerfile](Dockerfile)
 docker run \
     -d \
     -e "API_KEY=my-api-key" \
+    -e "MYSQL_AUTOCONF=true" \
     -e "MYSQL_HOST=10.255.1.101" \
     -e "MYSQL_USER=root" \
     -e "MYSQL_PWD=root3306" \

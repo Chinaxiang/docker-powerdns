@@ -3,7 +3,6 @@ MAINTAINER Chinaxiang
 
 # 环境变量
 ENV DATA_DIR /srv/data
-
 ENV MYSQL_AUTOCONF=true \
     MYSQL_HOST="localhost" \
     MYSQL_PORT="3306" \
@@ -12,41 +11,28 @@ ENV MYSQL_AUTOCONF=true \
     MYSQL_DB="pdns" \
     MYSQL_ADMIN_DB="pdns_admin"
 
-# Configurable environment variables
-####################################
 # Custom API Key for PowerDNS.
 # Leave empty to autogenerate one ( HIGHLY SUGGESTED! )
 ENV API_KEY ""
 
 # Create Volume entry points
-############################
-
 VOLUME $DATA_DIR
 
-# Copy required files and fix permissions
-#########################################
-
+# Copy required files
 COPY src/* /root/
 
 # Create missing directories
-############################
-
 RUN mkdir -p $DATA_DIR
 
 # Set the work directory
-########################
-
 WORKDIR /root
 
 # Fix permissions
-#################
-
 RUN chmod 0644 * \
     && chmod 0755 *.sh
 
 # Install required packages
 ##############################
-
 RUN apk --update add --no-cache \
     bash \
     supervisor \
@@ -72,7 +58,6 @@ RUN apk --update add --no-cache --virtual .build-deps \
 
 # Install PowerDNS Admin
 ##############################
-
 RUN mkdir -p /usr/share/webapps/ \
     && cd /usr/share/webapps/ \
     && git clone https://github.com/Chinaxiang/PowerDNS-Admin.git powerdns-admin \
@@ -82,7 +67,6 @@ RUN mkdir -p /usr/share/webapps/ \
 
 # Cleanup
 #########
-
 RUN find /usr/local \
       \( -type d -a -name test -o -name tests \) \
       -o \( -type f -a -name '*.pyc' -o -name '*.pyo' \) \
@@ -104,7 +88,6 @@ RUN ln -sf /proc/1/fd/1 /var/log/docker.log
 
 # Expose required ports
 #######################
-
 EXPOSE 53
 EXPOSE 53/udp
 EXPOSE 8080
@@ -116,5 +99,4 @@ SHELL ["/bin/bash", "-c"]
 
 # Set the entry point to init.sh
 ###########################################
-
 ENTRYPOINT /root/init.sh
