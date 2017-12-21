@@ -6,6 +6,20 @@ PowerDNS + Admin GUI + Sqllite in one single Docker
 
 See [Dockerfile](Dockerfile)
 
+## Docker images
+
+> Docker Hub
+
+```
+docker pull chinaxiang/docker-powerdns
+```
+
+> Aliyun Hub
+
+```
+docker pull registry.cn-hangzhou.aliyuncs.com/chinaxiang/docker-powerdns
+```
+
 ## How to use
 
 ### Simple
